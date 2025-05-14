@@ -1,0 +1,6 @@
+.venv/
+*.pth
+*.onnx
+*.jpeg
+*.tiff
+*.png
