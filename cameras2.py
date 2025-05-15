@@ -89,7 +89,9 @@ def load_ground_truth(json_path):
         return json.load(json_file)
 
 
+def detect_cameras():
 
+    return
 
 dir_path = r"C:\Users\User\Desktop\SecCamera_Thermal\\"
 flip= ['v', 'h']  # flip image vertically and horizontally
