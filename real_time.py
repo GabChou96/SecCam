@@ -10,7 +10,7 @@ from flirpy.camera.boson import Boson
 
 # # Attempt to open serial connection
 # try:
-#     ser = serial.Serial('COM3', baudrate=921600, timeout=1)  # Adjust 'COM3' as needed
+#     ser = serial.Serial('COM4', baudrate=921600, timeout=1)  # Adjust 'COM3' as needed
 #     # # Initialize FLIR Boson camera
 #
 #     camera_connected = True
@@ -136,7 +136,7 @@ class ThermalCameraApp(QWidget):
         self.frozen_image = None
         try:
             # Attempt to open serial connection
-            self.camera = Boson(port="COM3")
+            self.camera = Boson(port="COM4")
             self.camera_connected = True
         except:
             print("Warning: No camera detected. Using synthetic image.")
@@ -158,6 +158,8 @@ class ThermalCameraApp(QWidget):
                 img_array = self.camera.grab()
                 if img_array is None:
                     raise ValueError("No image data received")
+                img_array = np.fliplr(img_array)
+                img_array = np.flipud(img_array)
                 img_normalized = cv2.normalize(img_array, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
             except Exception as e:
                 print(f"Warning: {e}. Using synthetic image instead.")
