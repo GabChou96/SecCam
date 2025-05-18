@@ -119,7 +119,7 @@ def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
                         # if diff_in_out > diff_in_out_param:  # sorted(all_diff, reverse=True)[5]: #diff_in_out_param:  # and ilu-out_mean> np.percentile(np.array(all_diff), 75): #sum(local_max[y:y + h, x:x + w].flatten())>0:
                         # (thermal_image[y:y + h, x:x + w].max() - out_mean)/min(max(w, 1),max(h, 1)) > 0.1 and
                         if  diff_in_out > diff_in_out_param:
-                            cv2.rectangle(highlights, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                            # cv2.rectangle(highlights, (x, y), (x + w, y + h), (255, 0, 0), 2)
                             # predicted_boxes.append([x, y, w, h])
 
 
@@ -129,92 +129,17 @@ def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
                             big_100 = thermal_image[y + h // 2 - 50:y + h // 2 + 50, x + w // 2 - 50:x + w // 2 + 50].copy()
                             big_100[50-h//2:5+h//2, 5-w//2:50+w//2] = 0
                             inside_max = thermal_image[y:y + h, x:x + w].max()
-                            cv2.putText(highlights, f"{len(np.where((big_100> inside_max-0.1) & (big_100< inside_max+0.1))[0])}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
 
                             if len(np.where((big_100> inside_max-0.1) & (big_100< inside_max+0.1))[0])<50:
                                 cv2.rectangle(highlights, (x, y), (x + w, y + h), (127, 0, 127), 2)
+                                cv2.putText(highlights,
+                                            f"{len(np.where((big_100 > inside_max - 0.1) & (big_100 < inside_max + 0.1))[0])}",
+                                            (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
+
                                 predicted_boxes.append([x, y, w, h])
     return highlights , predicted_boxes
 
 
-
-def detection(thermal_image):
-    thermal_image = thermal_image/100 - 273
-    # Normalize the image to the range [0, 255]
-    thermal_image_normalized = cv2.normalize(thermal_image, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-    mod_thermal_image = cv2.cvtColor(thermal_image_normalized, cv2.COLOR_GRAY2BGR)
-    # Define the kernel size (n*n area)
-    kernel_size = 30  # Adjust this to your desired area size
-
-    # Calculate the local mean and standard deviation for each pixel
-    mean = cv2.blur(thermal_image.astype(np.float32), (kernel_size, kernel_size))
-    squared_img = cv2.blur(thermal_image.astype(np.float32) ** 2, (kernel_size, kernel_size))
-    std = np.sqrt(abs(squared_img - mean ** 2))
-
-    # Calculate how far each pixel is from the local mean and standard deviation
-    difference_from_mean = np.maximum(thermal_image.astype(np.float32) - mean, 0)
-    normalized_difference = difference_from_mean / (std + 1e-7)  # Avoid divide-by-zero
-    binary_image = np.where(normalized_difference >  np.percentile(normalized_difference, 99), 127, 0).astype(np.uint8)
-    binary_image_diff = np.where(difference_from_mean > np.percentile(difference_from_mean, 98), 127, 0).astype(np.uint8)
-
-    # cv2.setMouseCallback("norm diff", get_pixel)
-    binary_image = np.where(normalized_difference + difference_from_mean >  np.percentile(normalized_difference + difference_from_mean, 99), 255, 0).astype(np.uint8)
-
-    # Define a structuring element (kernel)
-    kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (1, 1))  # You can use (3, 3), (5, 5), etc.
-    kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))  # You can use (3, 3), (5, 5), etc.
-    # Apply opening
-    closing = cv2.morphologyEx(binary_image, cv2.MORPH_CLOSE, kernel_open)
-    opening = cv2.morphologyEx(closing, cv2.MORPH_OPEN, kernel_open)
-
-    contours, hierarchy = cv2.findContours(opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    highlights = cv2.cvtColor(thermal_image_normalized, cv2.COLOR_GRAY2BGR)
-
-    height, width = thermal_image_normalized.shape
-    all_diff = []
-    for c in contours:
-        if cv2.contourArea(c)>3 and cv2.contourArea(c)<500:
-            x, y, w, h = cv2.boundingRect(c)
-            ilu = thermal_image[y:y + h, x:x + w].mean()
-            big_rec = thermal_image[max(y - h, 0):min(y + 2*h, height),
-                      max(x - w, 0):min(x + 2*w,  width)].mean()
-            out_mean = (9*big_rec - ilu)/8
-            all_diff.append(ilu - out_mean)
-    predicted_boxes = []
-    for c in contours:
-        if cv2.contourArea(c)>3 and cv2.contourArea(c)<500:
-            x, y, w, h = cv2.boundingRect(c)
-            ratio = h / w if h > w else w / h
-            # cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 0, 255), 2)
-
-            if ratio < 4: #w*h>9 and
-                ilu = thermal_image[y:y + h, x:x + w].mean()
-                big_rec = thermal_image[max(y - h, 0):min(y + 2 * h, height),
-                          max(x - w, 0):min(x + 2 * w, width)].mean()
-                rec = thermal_image[max(y - h, 0):min(y + 2 * h, height),
-                          max(x - w, 0):min(x + 2 * w, width)].copy()
-                rec[h:2*h, w:2*w] = 0
-                diff_in_out = thermal_image[y:y + h, x:x + w].max() - rec.max()
-                out_mean = (9*big_rec - ilu) / 8
-                #todo bring back
-                # cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 0, 255), 2)
-                # cv2.putText(highlights, f"{ilu - out_mean:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
-                if thermal_image[y:y + h, x:x + w].max()- out_mean>1:
-                    if diff_in_out >0  and  ((difference_from_mean[y:y + h, x:x + w]>2).sum()>1 or (normalized_difference[y:y + h, x:x + w]>2).sum()>1):
-                        # print("area:", cv2.contourArea(c), "ratio:", w, h, "mean ilu", ilu, "mean all", thermal_image.mean(), f"{int(ilu)/int(thermal_image.mean()):.1f}")
-                        cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                        # cv2.putText(highlights, f"{ilu - out_mean:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
-                        cv2.putText(highlights, f"{diff_in_out:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                                    0.3, (255, 0, 0), 1)
-                        predicted_boxes.append([x, y, w, h])
-
-
-                        if diff_in_out >1: #ilu-out_mean> np.percentile(np.array(all_diff), 75): #sum(local_max[y:y + h, x:x + w].flatten())>0:
-                            cv2.rectangle(highlights, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                            cv2.putText(highlights,f"{diff_in_out:.1f}", (x-10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
-                            # predicted_boxes.append([x, y, w, h])
-                            # cv2.putText(highlights,f"{ilu- out_mean:.1f}", (x-10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
-    return highlights, predicted_boxes
 
 class ThermalCameraApp(QWidget):
     def __init__(self):
@@ -253,7 +178,7 @@ class ThermalCameraApp(QWidget):
         self.frozen_image = None
         try:
             # Attempt to open serial connection
-            self.camera = Boson(port="COM3")
+            self.camera = Boson(port="COM4")
             self.camera_connected = True
         except:
             print("Warning: No camera detected. Using synthetic image.")
