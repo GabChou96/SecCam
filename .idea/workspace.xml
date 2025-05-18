@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="80b8c00e-803e-4d9d-a83e-c5f61e7e4386" name="Changes" comment="" />
+    <list default="true" id="80b8c00e-803e-4d9d-a83e-c5f61e7e4386" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tools/open_tagged.py" beforeDir="false" afterPath="$PROJECT_DIR$/Tools/open_tagged.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tools/tagg_images.py" beforeDir="false" afterPath="$PROJECT_DIR$/Tools/tagg_images.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cameras2.py" beforeDir="false" afterPath="$PROJECT_DIR$/cameras2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/real_time.py" beforeDir="false" afterPath="$PROJECT_DIR$/real_time.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -62,7 +68,7 @@
       <recent name="C:\Users\User\PycharmProjects\PythonProject\Thermi\model" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.real_time">
+  <component name="RunManager" selected="Python.cameras2">
     <configuration name="cameras2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Thermi" />
       <option name="ENV_FILES" value="" />
@@ -180,10 +186,10 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.real_time" />
         <item itemvalue="Python.cameras2" />
         <item itemvalue="Python.open_tagged (1)" />
         <item itemvalue="Python.tagg_images (1)" />
+        <item itemvalue="Python.real_time" />
         <item itemvalue="Python.tagg_images" />
       </list>
     </recent_temporary>
@@ -208,7 +214,8 @@
       <workItem from="1745389793191" duration="16299000" />
       <workItem from="1745476690102" duration="20198000" />
       <workItem from="1745738406675" duration="135686000" />
-      <workItem from="1747293688596" duration="8961000" />
+      <workItem from="1747293688596" duration="9362000" />
+      <workItem from="1747315371426" duration="20208000" />
     </task>
     <servers />
   </component>
@@ -251,7 +258,19 @@
           <line>271</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/real_time.py</url>
+          <line>213</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
       </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
@@ -263,14 +282,14 @@
     <SUITE FILE_PATH="coverage/Thermi$try.coverage" NAME="try Coverage Results" MODIFIED="1746454845379" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Thermi$open_tagged.coverage" NAME="open_tagged Coverage Results" MODIFIED="1747139485243" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Thermi$cameras.coverage" NAME="cameras Coverage Results" MODIFIED="1747034431938" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Thermi$real_time.coverage" NAME="real_time Coverage Results" MODIFIED="1747310523388" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Thermi$real_time.coverage" NAME="real_time Coverage Results" MODIFIED="1747565482219" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Thermi$try2.coverage" NAME="try2 Coverage Results" MODIFIED="1746365105279" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Thermi$cameras2.coverage" NAME="cameras2 Coverage Results" MODIFIED="1747298565122" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Thermi$tagg_images__1_.coverage" NAME="tagg_images (1) Coverage Results" MODIFIED="1747204817227" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Tools" />
+    <SUITE FILE_PATH="coverage/Thermi$cameras2.coverage" NAME="cameras2 Coverage Results" MODIFIED="1747577889951" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Thermi$tagg_images__1_.coverage" NAME="tagg_images (1) Coverage Results" MODIFIED="1747573843352" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Tools" />
     <SUITE FILE_PATH="coverage/Thermi$ml.coverage" NAME="ml Coverage Results" MODIFIED="1745838097355" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Thermi$cameras_with_sam.coverage" NAME="cameras_with_sam Coverage Results" MODIFIED="1746453322103" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Thermi$sam_model.coverage" NAME="sam_model Coverage Results" MODIFIED="1746452512462" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Thermi$tagg_images.coverage" NAME="tagg_images Coverage Results" MODIFIED="1747140024545" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Thermi$open_tagged__1_.coverage" NAME="open_tagged (1) Coverage Results" MODIFIED="1747218262855" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Tools" />
+    <SUITE FILE_PATH="coverage/Thermi$open_tagged__1_.coverage" NAME="open_tagged (1) Coverage Results" MODIFIED="1747576348730" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Tools" />
   </component>
 </project>

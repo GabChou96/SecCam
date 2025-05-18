@@ -13,6 +13,43 @@ from skimage import io, filters, feature
 from skimage.filters import threshold_otsu
 
 
+def evaluate_metrics(ground_truths, predictions, iou_threshold=0.5):
+    """
+    Compute Precision, Recall, and F1 Score.
+    ground_truths: List of ground-truth bounding boxes.
+    predictions: List of predicted bounding boxes.
+    """
+    tp = 0  # True Positives
+    fp = 0  # False Positives
+    fn = 0  # False Negatives
+
+    matched_gt = set()
+
+    for pred in predictions:
+        best_iou = 0
+        best_gt = None
+
+        for gt in ground_truths:
+            iou = compute_iou(pred, gt)
+            if iou > best_iou:
+                best_iou = iou
+                best_gt = tuple(gt)
+
+        if best_iou >= iou_threshold and best_gt not in matched_gt:
+            tp += 1
+            matched_gt.add(best_gt)
+        else:
+            fp += 1
+
+    fn = len(ground_truths) - tp  # Missed ground truths
+
+    precision = tp / (tp + fp) if tp + fp > 0 else 0
+    recall = tp / (tp + fn) if tp + fn > 0 else 0
+    f1 = 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
+
+    return precision, recall, f1
+
+
 def aggregate_close_contours(contours, max_distance=2):
     """
     Aggregates contours that are closer than `max_distance`.
@@ -98,8 +135,8 @@ flip= ['v', 'h']  # flip image vertically and horizontally
 all_accs = []
 all_falses = []
 problem_names =[]
-# for fname in os.listdir(dir_path + r"jsons\\"):
-for fname in ['Boson_Capture118.json', 'Boson_Capture119.json', 'Boson_Capture122.json', 'Boson_Capture130.json', 'Boson_Capture93.json']: #'Boson_Capture115.json'
+for fname in os.listdir(dir_path + r"jsons\\"):
+# for fname in 'Boson_Capture119.json', 'Boson_Capture130.json':
     if fname.endswith('.json') :
         image_path = os.path.join(dir_path, fname[:-5]+".tiff")
         print(image_path)
@@ -136,7 +173,7 @@ for fname in ['Boson_Capture118.json', 'Boson_Capture119.json', 'Boson_Capture12
         cv2.imshow("norm diff",np.hstack((norm_diff_see, binary_image)))
         cv2.imshow(" diff", np.hstack((diff_see, binary_image_diff)))
         # cv2.setMouseCallback("norm diff", get_pixel)
-        binary_image = np.where(normalized_difference + difference_from_mean >  np.percentile(normalized_difference + difference_from_mean, 99), 255, 0).astype(np.uint8)
+        binary_image = np.where(normalized_difference + difference_from_mean >  np.percentile(normalized_difference + difference_from_mean, 98), 255, 0).astype(np.uint8)
 
         # TODo check if this is better
         # local_maxima = feature.peak_local_max(normalized_difference+ difference_from_mean, min_distance=30)
@@ -162,18 +199,14 @@ for fname in ['Boson_Capture118.json', 'Boson_Capture119.json', 'Boson_Capture12
         cv2.setMouseCallback("Original Image", get_pixel)
 
 
-        blurred = cv2.GaussianBlur(thermal_image, (3, 3), 0)
-        # Apply Laplacian operator
-        laplacian = cv2.Laplacian(blurred, cv2.CV_64F)
-        # Convert the result to 8-bit for visualization
-        laplacian = cv2.convertScaleAbs(laplacian)
-        laplacian = cv2.normalize(laplacian, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-
-
-
+        # blurred = cv2.GaussianBlur(thermal_image, (3, 3), 0)
+        # # Apply Laplacian operator
+        # laplacian = cv2.Laplacian(blurred, cv2.CV_64F)
+        # # Convert the result to 8-bit for visualization
+        # laplacian = cv2.convertScaleAbs(laplacian)
+        # laplacian = cv2.normalize(laplacian, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
         # Display the images
         # cv2.imshow('LoG Result', np.hstack((laplacian, cv2.threshold(laplacian, 10, 255, cv2.THRESH_BINARY)[1])))
-
         # cv2.setMouseCallback("Original Image", get_pixel)
         # unique, counts = np.unique(difference_from_mean, return_counts=True)
         # print( unique, counts)
@@ -186,9 +219,9 @@ for fname in ['Boson_Capture118.json', 'Boson_Capture119.json', 'Boson_Capture12
         # Apply opening
         closing = cv2.morphologyEx(binary_image, cv2.MORPH_CLOSE, kernel_open)
         opening = cv2.morphologyEx(closing, cv2.MORPH_OPEN, kernel_open)
+        cv2.imshow("close", np.hstack((opening, closing)))
 
         contours, hierarchy = cv2.findContours(opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
 
         # Apply connected components analysis
         # num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(opening_check)
@@ -201,7 +234,7 @@ for fname in ['Boson_Capture118.json', 'Boson_Capture119.json', 'Boson_Capture12
         height, width = thermal_image_normalized.shape
         all_diff = []
         for c in contours:
-            if cv2.contourArea(c)>3 and cv2.contourArea(c)<500:
+            if cv2.contourArea(c)>3 and cv2.contourArea(c)<350:
                 x, y, w, h = cv2.boundingRect(c)
                 ilu = thermal_image[y:y + h, x:x + w].mean()
                 big_rec = thermal_image[max(y - h, 0):min(y + 2*h, height),
@@ -210,10 +243,12 @@ for fname in ['Boson_Capture118.json', 'Boson_Capture119.json', 'Boson_Capture12
                 all_diff.append(ilu - out_mean)
         predicted_boxes = []
         for c in contours:
-            if cv2.contourArea(c)>3 and cv2.contourArea(c)<500:
-                x, y, w, h = cv2.boundingRect(c)
+            x, y, w, h = cv2.boundingRect(c)
+            if (cv2.contourArea(c)>3 and cv2.contourArea(c)<350): # or w*h>5:
+
                 ratio = h / w if h > w else w / h
-                cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                # cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                # predicted_boxes.append([x, y, w, h])
 
                 if ratio < 4: #w*h>9 and
                     ilu = thermal_image[y:y + h, x:x + w].mean()
@@ -224,11 +259,13 @@ for fname in ['Boson_Capture118.json', 'Boson_Capture119.json', 'Boson_Capture12
                     rec[h:2*h, w:2*w] = 0
                     diff_in_out = thermal_image[y:y + h, x:x + w].max() - rec.max()
                     out_mean = (9*big_rec - ilu) / 8
+                    # predicted_boxes.append([x, y, w, h])
+
                     #todo bring back
                     # cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 0, 255), 2)
                     # cv2.putText(highlights, f"{ilu - out_mean:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
                     if thermal_image[y:y + h, x:x + w].max()- out_mean>1:
-                        predicted_boxes.append([x, y, w, h])
+                        # predicted_boxes.append([x, y, w, h])
 
                         # cv2.rectangle(highlights, (x, y), (x + w, y + h), (127, 127, 0), 2)
                         # cv2.putText(highlights, f"{ilu - out_mean:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
@@ -236,18 +273,18 @@ for fname in ['Boson_Capture118.json', 'Boson_Capture119.json', 'Boson_Capture12
                         # cv2.putText(highlights, f"{diff_in_out:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3,
                         #             (255, 0, 0), 1)
 
-                        if diff_in_out >0  and  (difference_from_mean[y:y + h, x:x + w]>2).sum()>1 or (normalized_difference[y:y + h, x:x + w]>2).sum()>1: #2.5: # todo: has to be according to image illumination
+                        if diff_in_out >0  and  ((difference_from_mean[y:y + h, x:x + w]>2).sum()>1 or (normalized_difference[y:y + h, x:x + w]>2).sum()>1): #2.5: # todo: has to be according to image illumination
                             # print("area:", cv2.contourArea(c), "ratio:", w, h, "mean ilu", ilu, "mean all", thermal_image.mean(), f"{int(ilu)/int(thermal_image.mean()):.1f}")
-                            cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                            # cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 255, 0), 2)
                             # cv2.putText(highlights, f"{ilu - out_mean:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
-                            cv2.putText(highlights, f"{diff_in_out:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                                        0.3, (255, 0, 0), 1)
+                            # cv2.putText(highlights, f"{diff_in_out:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                            #             0.3, (255, 0, 0), 1)
                             # predicted_boxes.append([x, y, w, h])
 
                             if diff_in_out >1: #ilu-out_mean> np.percentile(np.array(all_diff), 75): #sum(local_max[y:y + h, x:x + w].flatten())>0:
                                 cv2.rectangle(highlights, (x, y), (x + w, y + h), (255, 0, 0), 2)
                                 cv2.putText(highlights,f"{diff_in_out:.1f}", (x-10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
-                                # predicted_boxes.append([x, y, w, h])
+                                predicted_boxes.append([x, y, w, h])
                                 # cv2.putText(highlights,f"{ilu- out_mean:.1f}", (x-10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
         print("all diff", np.mean(np.array(all_diff)),np.median(np.array(all_diff)), np.percentile(np.array(all_diff), 50), np.percentile(np.array(all_diff), 75), len(all_diff) )
 
@@ -267,7 +304,7 @@ for fname in ['Boson_Capture118.json', 'Boson_Capture119.json', 'Boson_Capture12
             print(f"number of objects: {len(ground_truth_boxes)}, number of good predictions: {good_detection}, percentage: {good_detection/len(ground_truth_boxes):.2f}")
             all_accs.append(good_detection / len(ground_truth_boxes))
             if good_detection / len(ground_truth_boxes) <1:
-                problem_names.append(fname)
+                problem_names.append((fname,good_detection / len(ground_truth_boxes)) )
         else:
             print("no objects in the image")
             # all_accs.append(-1)
@@ -277,8 +314,7 @@ for fname in ['Boson_Capture118.json', 'Boson_Capture119.json', 'Boson_Capture12
 
 
         cv2.imshow("image",highlights)
-        cv2.imshow("close", np.hstack((opening, closing)))
-        k = cv2.waitKey(0)
+        k = cv2.waitKey(10)
         if k == ord("k"):
             print([cv2.boundingRect(c) for c in contours if cv2.contourArea(c)>2 and cv2.contourArea(c)<100])
 

@@ -42,6 +42,8 @@ def save_to_json(bounding_boxes, file_path="bounding_boxes"):
 for image_path in os.listdir(dir_path):
     bounding_boxes = []
     if image_path.endswith(".tiff"):
+        if image_path[:-5]+'.json' in os.listdir(dir_path + r"jsons\\"):
+            continue
         print(f"Selected image: {image_path}")
         img = cv2.imread(dir_path + image_path, cv2.IMREAD_ANYDEPTH)
 
