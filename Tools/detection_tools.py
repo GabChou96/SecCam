@@ -231,12 +231,10 @@ def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
                             bbox_and_max.append([thermal_image[y:y + h, x:x + w].max(), [x, y, w, h]])
                             big_100 = thermal_image[y + h // 2 - 50:y + h // 2 + 50, x + w // 2 - 50:x + w // 2 + 50].copy()
                             big_100[50-h//2:5+h//2, 5-w//2:50+w//2] = 0
-                            inside_mean = thermal_image[y:y + h, x:x + w].max()
-                            print(inside_mean)
-                            print(big_100)
-                            cv2.putText(highlights, f"{len(np.where((big_100> inside_mean-0.1) & (big_100< inside_mean+0.1))[0])}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
+                            inside_max = thermal_image[y:y + h, x:x + w].max()
+                            cv2.putText(highlights, f"{len(np.where((big_100> inside_max-0.1) & (big_100< inside_max+0.1))[0])}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
 
-                            if len(np.where((big_100> inside_mean-0.1) & (big_100< inside_mean+0.1))[0])<50:
+                            if len(np.where((big_100> inside_max-0.1) & (big_100< inside_max+0.1))[0])<50:
                                 cv2.rectangle(highlights, (x, y), (x + w, y + h), (127, 0, 127), 2)
                                 predicted_boxes.append([x, y, w, h])
 

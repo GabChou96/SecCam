@@ -149,6 +149,7 @@ def save_to_json(file_path="bounding_boxes"):
 # image_path = select_image()
 for image_path in os.listdir(dir_path):
     bounding_boxes = []
+    image_path=image_path[:-5] + ".tiff"
     if image_path.endswith(".tiff"):
         # if image_path[:-5]+'.json' in os.listdir(dir_path + r"jsons\\"):
         #     continue
