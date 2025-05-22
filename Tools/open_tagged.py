@@ -33,8 +33,9 @@ dir_path =r"C:\Users\User\Desktop\SecCamera_Thermal\\"
 
 # Select the image file
 # image_path = select_image()
-for image_path in ['Boson_Capture108.json', 'Boson_Capture115.json', 'Boson_Capture116.json', 'Boson_Capture117.json', 'Boson_Capture118.json', 'Boson_Capture119.json', 'Boson_Capture120.json', 'Boson_Capture121.json', 'Boson_Capture122.json', 'Boson_Capture129.json', 'Boson_Capture130.json', 'Boson_Capture144.json', 'Boson_Capture149.json', 'Boson_Capture150.json', 'Boson_Capture153.json', 'Boson_Capture160.json', 'Boson_Capture163.json', 'Boson_Capture168.json', 'Boson_Capture169.json', 'Boson_Capture89.json']:
-#os.listdir(dir_path + r"jsons\\"):
+for image_path in ['Boson_Capture119.json', 'Boson_Capture130.json', 'Boson_Capture168.json']:
+# for image_path in ['Boson_Capture119.json', 'Boson_Capture130.json', 'Boson_Capture144.json', 'Boson_Capture149.json', 'Boson_Capture150.json', 'Boson_Capture168.json', 'Boson_Capture170.json']:
+# for image_path in os.listdir(dir_path + r"jsons\\"):
     if image_path:
         # Load image
         img = cv2.imread(dir_path + image_path[:-5]+".tiff", cv2.IMREAD_ANYDEPTH)
@@ -52,6 +53,10 @@ for image_path in ['Boson_Capture108.json', 'Boson_Capture115.json', 'Boson_Capt
             # Load bounding boxes from the JSON folder
             bounding_boxes = load_bounding_boxes(image_path)
             cv2.imshow(" Image", img_normalized)
+            # k = cv2.waitKey(0)
+            # if k==ord('s'):
+            #     cv2.imwrite(image_path[:-5]+".jpeg", img_normalized)
+
             # Draw bounding boxes on the image
             for box in bounding_boxes:
                 x, y, w, h = box["x"], box["y"], box["w"], box["h"]

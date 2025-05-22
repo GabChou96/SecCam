@@ -32,7 +32,7 @@ def detection(thermal_image):
     # Calculate the local mean and standard deviation for each pixel
     mean = cv2.blur(thermal_image.astype(np.float32), (kernel_size, kernel_size))
     squared_img = cv2.blur(thermal_image.astype(np.float32) ** 2, (kernel_size, kernel_size))
-    std = np.sqrt(squared_img - mean ** 2)
+    std = np.sqrt(abs(squared_img - mean ** 2))
 
     # Calculate how far each pixel is from the local mean and standard deviation
     difference_from_mean = np.maximum(thermal_image.astype(np.float32) - mean, 0)
@@ -68,7 +68,7 @@ def detection(thermal_image):
         if cv2.contourArea(c)>3 and cv2.contourArea(c)<500:
             x, y, w, h = cv2.boundingRect(c)
             ratio = h / w if h > w else w / h
-            cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 0, 255), 2)
+            # cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
             if ratio < 4: #w*h>9 and
                 ilu = thermal_image[y:y + h, x:x + w].mean()
@@ -83,20 +83,21 @@ def detection(thermal_image):
                 # cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 0, 255), 2)
                 # cv2.putText(highlights, f"{ilu - out_mean:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
                 if thermal_image[y:y + h, x:x + w].max()- out_mean>1:
-
-                    if diff_in_out >0  and  (difference_from_mean[y:y + h, x:x + w]>2).sum()>1 or (normalized_difference[y:y + h, x:x + w]>2).sum()>1: #2.5: # todo: has to be according to image illumination
+                    if diff_in_out >0  and  ((difference_from_mean[y:y + h, x:x + w]>2).sum()>1 or (normalized_difference[y:y + h, x:x + w]>2).sum()>1):
                         # print("area:", cv2.contourArea(c), "ratio:", w, h, "mean ilu", ilu, "mean all", thermal_image.mean(), f"{int(ilu)/int(thermal_image.mean()):.1f}")
                         cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 255, 0), 2)
                         # cv2.putText(highlights, f"{ilu - out_mean:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
                         cv2.putText(highlights, f"{diff_in_out:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
                                     0.3, (255, 0, 0), 1)
-                        # predicted_boxes.append([x, y, w, h])
+                        predicted_boxes.append([x, y, w, h])
+
 
                         if diff_in_out >1: #ilu-out_mean> np.percentile(np.array(all_diff), 75): #sum(local_max[y:y + h, x:x + w].flatten())>0:
                             cv2.rectangle(highlights, (x, y), (x + w, y + h), (255, 0, 0), 2)
                             cv2.putText(highlights,f"{diff_in_out:.1f}", (x-10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
-                            predicted_boxes.append([x, y, w, h])
+                            # predicted_boxes.append([x, y, w, h])
                             # cv2.putText(highlights,f"{ilu- out_mean:.1f}", (x-10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
+    print("end", predicted_boxes)
     return highlights, predicted_boxes
 
 class ThermalCameraApp(QWidget):
@@ -147,7 +148,7 @@ class ThermalCameraApp(QWidget):
         img = np.zeros((512, 640), dtype=np.uint8)
         for i in range(512):
             img[i] = np.sin(np.linspace(0, np.pi * 3, 640) + (i / 20) + (frame_counter / 5)) * 127 + 128
-        return img
+        return abs(img)
 
 
 
@@ -211,7 +212,11 @@ class ThermalCameraApp(QWidget):
         """ Convert and display image in QLabel """
         height, width= image.shape[0], image.shape[1]
         bytes_per_line = width
-        q_image = QImage(image.data, width, height, bytes_per_line, QImage.Format_Grayscale8)
+        if len(image.shape) == 3:
+            bytes_per_line *= 3
+            q_image = QImage(image.data, width, height, bytes_per_line, QImage.Format_RGB888)
+        else:
+            q_image = QImage(image.data, width, height, bytes_per_line, QImage.Format_Grayscale8)
         self.image_label.setPixmap(QPixmap.fromImage(q_image))
 
 # Run the app

@@ -38,45 +38,46 @@ def save_to_json(bounding_boxes, file_path="bounding_boxes"):
 
 
 # Load the selected image
-# image_path = select_image()
-for image_path in os.listdir(dir_path):
-    bounding_boxes = []
-    if image_path.endswith(".tiff"):
-        if image_path[:-5]+'.json' in os.listdir(dir_path + r"jsons\\"):
-            continue
-        print(f"Selected image: {image_path}")
-        img = cv2.imread(dir_path + image_path, cv2.IMREAD_ANYDEPTH)
+image_path = select_image()
+# for image_path in os.listdir(dir_path):
+bounding_boxes = []
+if image_path.endswith(".tiff"):
+    # if image_path[:-5]+'.json' in os.listdir(dir_path + r"jsons\\"):
+    #     continue
+    print(f"Selected image: {image_path}")
+    # img = cv2.imread(dir_path + image_path, cv2.IMREAD_ANYDEPTH)
+    img = cv2.imread(image_path, cv2.IMREAD_ANYDEPTH)
 
-        if img is None:
-            print("Error: Cannot load image.")
-        else:
-            img = np.fliplr(img)
-            img = np.flipud(img)
-            img = img / 100 - 273
-            # Normalize the image to the range [0, 255]
-            img_normalized = cv2.normalize(img, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-            img_normalized = cv2.cvtColor(img_normalized, cv2.COLOR_GRAY2BGR)
-            original = img_normalized.copy()
-            cv2.namedWindow("Bounding Box Editor")
-            cv2.setMouseCallback("Bounding Box Editor", draw_bounding_box)
-
-            while True:
-                cv2.imshow("Bounding Box Editor", img_normalized)
-                key = cv2.waitKey(1) & 0xFF
-
-                if key == ord('s'):  # Save bounding boxes
-                    save_to_json(bounding_boxes, os.path.splitext(os.path.basename(image_path))[0]
-    )
-                elif key == ord('r'):  # Reset bounding boxes
-                    print("cleared")
-                    bounding_boxes.clear()
-                    print(bounding_boxes)
-                    img_normalized = original.copy()
-                    cv2.imshow("Bounding Box Editor", img_normalized)
-                    cv2.waitKey(1)
-                elif key == ord('q'):  # Quit application
-                    break
-
-            cv2.destroyAllWindows()
+    if img is None:
+        print("Error: Cannot load image.")
     else:
-        print("No image selected.")
+        img = np.fliplr(img)
+        img = np.flipud(img)
+        img = img / 100 - 273
+        # Normalize the image to the range [0, 255]
+        img_normalized = cv2.normalize(img, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+        img_normalized = cv2.cvtColor(img_normalized, cv2.COLOR_GRAY2BGR)
+        original = img_normalized.copy()
+        cv2.namedWindow("Bounding Box Editor")
+        cv2.setMouseCallback("Bounding Box Editor", draw_bounding_box)
+
+        while True:
+            cv2.imshow("Bounding Box Editor", img_normalized)
+            key = cv2.waitKey(1) & 0xFF
+
+            if key == ord('s'):  # Save bounding boxes
+                save_to_json(bounding_boxes, os.path.splitext(os.path.basename(image_path))[0]
+)
+            elif key == ord('r'):  # Reset bounding boxes
+                print("cleared")
+                bounding_boxes.clear()
+                print(bounding_boxes)
+                img_normalized = original.copy()
+                cv2.imshow("Bounding Box Editor", img_normalized)
+                cv2.waitKey(1)
+            elif key == ord('q'):  # Quit application
+                break
+
+        cv2.destroyAllWindows()
+else:
+    print("No image selected.")
