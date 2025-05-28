@@ -181,7 +181,6 @@ def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
     predicted_boxes = []
     means_pred = []
     maxs_pred = []
-    sub_means_pred=[]
     bbox_and_max = []
     for c in contours:
         x, y, w, h = cv2.boundingRect(c)
@@ -190,13 +189,15 @@ def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
             # cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 0, 255), 2)
             # predicted_boxes.append([x, y, w, h])
 
-            if ratio < 4:  # w*h>9 and
+            if ratio < 4:  #3?:  # w*h>9 and
                 ilu = thermal_image[y:y + h, x:x + w].mean()
                 big_rec = thermal_image[max(y - h, 0):min(y + 2 * h, height),
                           max(x - w, 0):min(x + 2 * w, width)].mean()
                 rec = thermal_image[max(y - h, 0):min(y + 2 * h, height),
                       max(x - w, 0):min(x + 2 * w, width)].copy()
                 rec[h:2 * h, w:2 * w] = 0
+                if len(np.where(rec <0)[0]) / rec.size >0.7:
+                    continue
                 diff_in_out = thermal_image[y:y + h, x:x + w].max() - rec.max()
                 out_mean = (9 * big_rec - ilu) / 8
                 # predicted_boxes.append([x, y, w, h])
@@ -222,28 +223,66 @@ def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
                         # (thermal_image[y:y + h, x:x + w].max() - out_mean)/min(max(w, 1),max(h, 1)) > 0.1 and
                         if  diff_in_out > diff_in_out_param:
                             cv2.rectangle(highlights, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                            cv2.putText(highlights, f"{thermal_image[y:y + h, x:x + w].mean():.1f}, {thermal_image[y:y + h, x:x + w].max():.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
                             # predicted_boxes.append([x, y, w, h])
 
 
                             means_pred.append(thermal_image[y:y + h, x:x + w].mean())
-                            sub_means_pred.append(thermal_image[y:y + h, x:x + w].mean()- thermal_image[y-15:y + h+15, x-15:x+15 + w].mean())
                             maxs_pred.append(thermal_image[y:y + h, x:x + w].max())
                             bbox_and_max.append([thermal_image[y:y + h, x:x + w].max(), [x, y, w, h]])
+                            big_100 = thermal_image[y + h // 2 - 50:y + h // 2 + 50, x + w // 2 - 50:x + w // 2 + 50].copy()
+                            big_100[50-h//2:5+h//2, 5-w//2:50+w//2] = 0
+                            inside_mean = thermal_image[y:y + h, x:x + w].max()
+                            print(inside_mean)
+                            print(big_100)
+                            cv2.putText(highlights, f"{len(np.where((big_100> inside_mean-0.1) & (big_100< inside_mean+0.1))[0])}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
+
+                            if len(np.where((big_100> inside_mean-0.1) & (big_100< inside_mean+0.1))[0])<50:
+                                cv2.rectangle(highlights, (x, y), (x + w, y + h), (127, 0, 127), 2)
+                                predicted_boxes.append([x, y, w, h])
+
+
                             # cv2.putText(highlights,f"{ilu- out_mean:.1f}", (x-10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
     #       np.percentile(np.array(all_diff), 75), len(all_diff))
-    bbox_and_max = sorted(bbox_and_max, key=lambda x: x[0])
+    # bbox_and_max = sorted(bbox_and_max, key=lambda x: x[0])
     # print(len(bbox_and_max))
-    for i in range(len(bbox_and_max)):
-        # print(i, bbox_and_max[i][0], bbox_and_max[i][1])
-        # print(i>0 and bbox_and_max[i][0] -bbox_and_max[i -1][0] <0.5,bbox_and_max[i][0] , bbox_and_max[i -1][0] )
-        # print(i < len(bbox_and_max) - 2 and bbox_and_max[i + 1][0] - bbox_and_max[i][0] < 0.5, bbox_and_max[i + 1][0],  bbox_and_max[i][0])
-        if (i>0 and bbox_and_max[i][0] -bbox_and_max[i -1][0] <0.3) and  (i<len(bbox_and_max)-2 and bbox_and_max[i+1][0] -bbox_and_max[i][0] <0.3):
-            continue
-        else:
-            cv2.rectangle(highlights, (bbox_and_max[i][1][0], bbox_and_max[i][1][1]), (bbox_and_max[i][1][0] + bbox_and_max[i][1][2], bbox_and_max[i][1][1] + bbox_and_max[i][1][3]), (127, 0, 127), 2)
-            predicted_boxes.append([bbox_and_max[i][1][0], bbox_and_max[i][1][1], bbox_and_max[i][1][2], bbox_and_max[i][1][3]])
+    # for i in range(len(bbox_and_max)):
+    #     # print(i, bbox_and_max[i][0], bbox_and_max[i][1])
+    #     # print(i>0 and bbox_and_max[i][0] -bbox_and_max[i -1][0] <0.5,bbox_and_max[i][0] , bbox_and_max[i -1][0] )
+    #     # print(i < len(bbox_and_max) - 2 and bbox_and_max[i + 1][0] - bbox_and_max[i][0] < 0.5, bbox_and_max[i + 1][0],  bbox_and_max[i][0])
+    #     if ((i>0 and bbox_and_max[i][0] -bbox_and_max[i -1][0] <0.3) and  ) or  (i<len(bbox_and_max)-2 and bbox_and_max[i+1][0] -bbox_and_max[i][0] <0.3):
+    #         continue
+    #     else:
+    #         cv2.rectangle(highlights, (bbox_and_max[i][1][0], bbox_and_max[i][1][1]), (bbox_and_max[i][1][0] + bbox_and_max[i][1][2], bbox_and_max[i][1][1] + bbox_and_max[i][1][3]), (127, 0, 127), 2)
+    #         predicted_boxes.append([bbox_and_max[i][1][0], bbox_and_max[i][1][1], bbox_and_max[i][1][2], bbox_and_max[i][1][3]])
             # cv2.putText(highlights, f"{bbox_and_max[i][0]:.1f}", (bbox_and_max[i][1][0] - 10, bbox_and_max[i][1][1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
+    # for i in range(len(bbox_and_max)):
+    #     out_i = True
+    #     xi, yi, wi, hi = bbox_and_max[i][1]
+    #     rec_i = thermal_image[max(yi - hi, 0):min(yi + 2 * hi, height),
+    #           max(xi - wi, 0):min(xi + 2 * wi, width)].copy()
+    #     rec_i[hi:2 * hi, wi:2 * wi] = 0
+    #     diff_in_out_i = thermal_image[yi:yi + hi, xi:xi + wi].max() - rec_i.max()
+    #     cv2.putText(highlights,
+    #                 f"{bbox_and_max[i][0]:.1f}, {diff_in_out_i:.1f}",
+    #                 (xi - 10, yi - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
+        # for j in range(len(bbox_and_max)):
+        #     xj, yj, wj, hj = bbox_and_max[j][1]
+        #     rec_j = thermal_image[max(yj - hj, 0):min(yj + 2 * hj, height),
+        #             max(xj - wj, 0):min(xj + 2 * wj, width)].copy()
+        #     rec_j[hj:2 * hj, wj:2 * wj] = 0
+        #     diff_in_out_j = thermal_image[yj:yj + hj, xj:xj + wj].max() - rec_j.max()
+        #     if i != j  and abs(bbox_and_max[i][0] - bbox_and_max[j][0]) < 0.2  and abs(diff_in_out_i - diff_in_out_j)  < 0.2:
+        #         # print(i, j, bbox_and_max[i][0], bbox_and_max[j][0], diff_in_out_i, diff_in_out_j)
+        #         out_i  = False
+        #         break
+        #
+        # # print(i, out_i)
+        # if out_i:
+        #     cv2.rectangle(highlights, (xi, yi), (xi + wi, yi + hi), (127, 0, 127), 2)
+        #     predicted_boxes.append([xi, yi, wi, hi])
+
+
+
     # plt.hist(means_pred, bins=100)
     # plt.title("Means")
     # plt.show()
@@ -256,17 +295,16 @@ def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
     return highlights , predicted_boxes
 
 
-def run_check_detections(diff_in_out_param = 1, diff_param =2, disply_image_time = 1):
+def run_check_detections(data_path, diff_in_out_param = 1, diff_param =2, disply_image_time = 1):
     dir_path = r"C:\Users\User\Desktop\SecCamera_Thermal\\"
     flip = ['v', 'h']  # flip image vertically and horizontally
     problem_names = []
     all_tp = []
     all_fp = []
     all_fn = []
-    for fname in os.listdir(dir_path + r"jsons\\"):
-    # for fname in ['Boson_Capture102.json', 'Boson_Capture115.json', 'Boson_Capture117.json', 'Boson_Capture118.json', 'Boson_Capture119.json', 'Boson_Capture120.json', 'Boson_Capture121.json', 'Boson_Capture130.json', 'Boson_Capture143.json', 'Boson_Capture144.json', 'Boson_Capture149.json', 'Boson_Capture150.json', 'Boson_Capture160.json', 'Boson_Capture163.json', 'Boson_Capture168.json', 'Boson_Capture170.json']:
-        if fname.endswith('.json') :
-            image_path = os.path.join(dir_path, fname[:-5]+".tiff")
+    for fname in data_path:
+        if fname.endswith('.json'):
+            image_path = os.path.join(dir_path, fname[:-5] + ".tiff")
             print(image_path)
             thermal_image = cv2.imread(image_path, cv2.IMREAD_ANYDEPTH)
             if 'h' in flip or 'H' in flip:
@@ -288,12 +326,18 @@ def run_check_detections(diff_in_out_param = 1, diff_param =2, disply_image_time
                 for pred in predicted_boxes:
                     iou = compute_iou(pred, [gt["x"], gt["y"], gt["w"], gt["h"]])
                     best_iou = max(best_iou, iou)
-                if best_iou > 0.5:
+                if best_iou > 0.5 and gt["label"] == "detection":
                     tp+=1
-            if tp<len(ground_truth_boxes):
+
+            # ground_truth_boxes[ground_truth_boxes[:]['label'] == "detection"]
+
+
+            len_detections = len([obj for obj in ground_truth_boxes if obj["label"] == "detection"])
+
+            if tp<len_detections:
                 problem_names.append(fname)
             fp = len(predicted_boxes) - tp
-            fn = len(ground_truth_boxes) - tp
+            fn = len_detections - tp
             all_fp.append(fp)
             all_tp.append(tp)
             all_fn.append(fn)
@@ -311,6 +355,4 @@ def run_check_detections(diff_in_out_param = 1, diff_param =2, disply_image_time
     print("mean false alarms : ", np.mean(np.array(all_fp)))
     print(problem_names)
     cv2.destroyAllWindows()
-
-
     return recall , precision, f1, np.mean(np.array(all_fp))

@@ -30,12 +30,12 @@ def load_bounding_boxes(image_path):
     return []  # Return empty if no JSON file is found
 
 dir_path =r"C:\Users\User\Desktop\SecCamera_Thermal\\"
-
+colors = {'detection':(0,255,0), 'ignore':(0, 255, 255)}
 # Select the image file
 # image_path = select_image()
-for image_path in ['Boson_Capture119.json', 'Boson_Capture130.json', 'Boson_Capture168.json']:
+# for image_path in ['Boson_Capture119.json', 'Boson_Capture130.json', 'Boson_Capture168.json']:
 # for image_path in ['Boson_Capture119.json', 'Boson_Capture130.json', 'Boson_Capture144.json', 'Boson_Capture149.json', 'Boson_Capture150.json', 'Boson_Capture168.json', 'Boson_Capture170.json']:
-# for image_path in os.listdir(dir_path + r"jsons\\"):
+for image_path in os.listdir(dir_path + r"jsons\\"):
     if image_path:
         # Load image
         img = cv2.imread(dir_path + image_path[:-5]+".tiff", cv2.IMREAD_ANYDEPTH)
@@ -59,8 +59,13 @@ for image_path in ['Boson_Capture119.json', 'Boson_Capture130.json', 'Boson_Capt
 
             # Draw bounding boxes on the image
             for box in bounding_boxes:
-                x, y, w, h = box["x"], box["y"], box["w"], box["h"]
-                cv2.rectangle(img_normalized, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                try:
+                    x, y, w, h, label = box["x"], box["y"], box["w"], box["h"], box['label']
+                    cv2.rectangle(img_normalized, (x, y), (x + w, y + h),colors[label], 2)
+                except:
+                    print("no labels")
+                    x, y, w, h = box["x"], box["y"], box["w"], box["h"]
+                    cv2.rectangle(img_normalized, (x, y), (x + w, y + h), colors['detection'], 2)
 
             # Show the image with bounding boxes
             cv2.imshow("Annotated Image", img_normalized)
