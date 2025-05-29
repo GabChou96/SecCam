@@ -20,11 +20,7 @@ from flirpy.camera.boson import Boson
 
 
 def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
-    def get_pixel(event, x, y, flags, param):
-        if event == cv2.EVENT_LBUTTONDOWN:  # Left mouse button click
-            pixel_value = thermal_image[y, x]
-            print(f'Pixel at ({x},{y}): {pixel_value}')
-        return
+
     # Normalize the image to the range [0, 255]
     thermal_image_normalized = cv2.normalize(thermal_image, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
     mod_thermal_image = cv2.cvtColor(thermal_image_normalized, cv2.COLOR_GRAY2BGR)
