@@ -31,6 +31,7 @@ def load_bounding_boxes(image_path):
 
 dir_path =r"C:\Users\User\Desktop\SecCamera_Thermal\\"
 colors = {'detection':(0,255,0), 'ignore':(0, 255, 255)}
+all_pathes =[]
 # Select the image file
 # image_path = select_image()
 # for image_path in ['Boson_Capture119.json', 'Boson_Capture130.json', 'Boson_Capture168.json']:
@@ -66,6 +67,7 @@ for image_path in os.listdir(dir_path + r"jsons\\"):
                     print("no labels")
                     x, y, w, h = box["x"], box["y"], box["w"], box["h"]
                     cv2.rectangle(img_normalized, (x, y), (x + w, y + h), colors['detection'], 2)
+                    all_pathes.append(image_path)
 
             # Show the image with bounding boxes
             cv2.imshow("Annotated Image", img_normalized)
@@ -73,3 +75,5 @@ for image_path in os.listdir(dir_path + r"jsons\\"):
             cv2.destroyAllWindows()
     else:
         print("No image selected.")
+
+print(all_pathes)
