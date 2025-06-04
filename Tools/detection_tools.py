@@ -293,7 +293,7 @@ def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
     return highlights , predicted_boxes
 
 
-def run_check_detections(data_path, diff_in_out_param = 1, diff_param =2, disply_image_time = 1):
+def run_check_detections(data_path, diff_in_out_param = 1, diff_param =2, display_image_time = 1):
     dir_path = r"C:\Users\User\Desktop\SecCamera_Thermal\\"
     flip = ['v', 'h']  # flip image vertically and horizontally
     problem_names = []
@@ -319,29 +319,35 @@ def run_check_detections(data_path, diff_in_out_param = 1, diff_param =2, disply
             ground_truth_boxes = load_ground_truth(fr"C:\Users\User\Desktop\SecCamera_Thermal\jsons\\{fname[:-5]}.json")
             # Compare predictions against ground truth
             tp = 0
+            not_count = 0
             for gt in ground_truth_boxes:
                 best_iou = 0
                 for pred in predicted_boxes:
                     iou = compute_iou(pred, [gt["x"], gt["y"], gt["w"], gt["h"]])
+                    if iou > 0.5 and gt["label"] == "ignore":
+                        not_count += 1
                     best_iou = max(best_iou, iou)
                 if best_iou > 0.5 and gt["label"] == "detection":
                     tp+=1
 
+
             # ground_truth_boxes[ground_truth_boxes[:]['label'] == "detection"]
 
-
+            not_count = min(not_count,len(predicted_boxes) - tp)
             len_detections = len([obj for obj in ground_truth_boxes if obj["label"] == "detection"])
 
             if tp<len_detections:
                 problem_names.append(fname)
-            fp = len(predicted_boxes) - tp
+            fp = len(predicted_boxes) - tp - not_count
             fn = len_detections - tp
+            print(f"{fname} - TP: {tp}, FP: {fp}, FN: {fn}, Total Detections: {len(predicted_boxes)}, Ground Truth Detections: {len_detections}")
             all_fp.append(fp)
             all_tp.append(tp)
             all_fn.append(fn)
 
             cv2.imshow("image",highlights)
-            cv2.waitKey(disply_image_time)
+            cv2.waitKey(display_image_time)
+
 
 
     precision = sum(all_tp) / (sum(all_tp) + sum(all_fp)) if (sum(all_tp) + sum(all_fp)) > 0 else 0
