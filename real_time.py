@@ -2,7 +2,7 @@ import sys
 import cv2
 import numpy as np
 import serial
-from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QWidget, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QWidget, QHBoxLayout, QGridLayout
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import Qt
@@ -146,12 +146,14 @@ class ThermalCameraApp(QWidget):
         super().__init__()
 
         self.setWindowTitle("FLIR Boson Thermal Camera")
-        self.setGeometry(100, 100, 680, 600)
+        # self.setGeometry(100, 100, 680, 600)
+        self.setGeometry(100, 100, 1920, 1440)
 
         # Layout
         self.image_label = QLabel(self)
-        self.image_label.setFixedSize(640, 512)
-
+        # self.image_label.setFixedSize(640, 512)
+        self.image_label.setFixedSize(1920, 1440)
+        # self.image_label.setGeometry(10, 10, self.width(), self.height())
         self.frame_counter = 0
 
         self.freeze_button = QPushButton("Freeze & Detect")
@@ -163,6 +165,7 @@ class ThermalCameraApp(QWidget):
         self.continue_button.clicked.connect(self.resume_live_feed)
 
         layout = QVBoxLayout()
+        # layout = QGridLayout()
         layout.addWidget(self.image_label)
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.freeze_button)
@@ -186,8 +189,8 @@ class ThermalCameraApp(QWidget):
 
     def generate_synthetic_frame(self, frame_counter):
         """ Generate a dynamic synthetic thermal-like image with flowing lines that move over time """
-        img = np.zeros((512, 640), dtype=np.uint8)
-        for i in range(512):
+        img = np.zeros((480, 640), dtype=np.uint8)
+        for i in range(480):
             img[i] = np.sin(np.linspace(0, np.pi * 3, 640) + (i / 20) + (frame_counter / 5)) * 127 + 128
         return abs(img)
 
@@ -251,12 +254,13 @@ class ThermalCameraApp(QWidget):
     def display_image(self, image):
         """ Convert and display image in QLabel """
         height, width= image.shape[0], image.shape[1]
-        bytes_per_line = width
+        disp_image = cv2.resize(image, (3*width, 3*height))
+        bytes_per_line = 3*width
         if len(image.shape) == 3:
             bytes_per_line *= 3
-            q_image = QImage(image.data, width, height, bytes_per_line, QImage.Format_RGB888)
+            q_image = QImage(disp_image.data, 3*width, 3*height, bytes_per_line, QImage.Format_RGB888)
         else:
-            q_image = QImage(image.data, width, height, bytes_per_line, QImage.Format_Grayscale8)
+            q_image = QImage(disp_image.data, 3*width, 3*height, bytes_per_line, QImage.Format_Grayscale8)
         self.image_label.setPixmap(QPixmap.fromImage(q_image))
 
 # Run the app
