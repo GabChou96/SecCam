@@ -7,6 +7,8 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import Qt
 from flirpy.camera.boson import Boson
+import datetime
+
 
 # # Attempt to open serial connection
 # try:
@@ -138,12 +140,9 @@ from flirpy.camera.boson import Boson
 
 
 def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
-    def get_pixel(event, x, y, flags, param):
-        if event == cv2.EVENT_LBUTTONDOWN:  # Left mouse button click
-            pixel_value = thermal_image[y, x]
-            print(f'Pixel at ({x},{y}): {pixel_value}')
-        return
-
+    thermal_image = np.fliplr(thermal_image)
+    thermal_image = np.flipud(thermal_image)
+    thermal_image = thermal_image / 100 - 273
     # Normalize the image to the range [0, 255]
     thermal_image_normalized = cv2.normalize(thermal_image, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
     mod_thermal_image = cv2.cvtColor(thermal_image_normalized, cv2.COLOR_GRAY2BGR)
@@ -154,12 +153,11 @@ def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
     # Calculate the local mean and standard deviation for each pixel
     mean = cv2.blur(thermal_image.astype(np.float32), (kernel_size, kernel_size))
     squared_img = cv2.blur(thermal_image.astype(np.float32) ** 2, (kernel_size, kernel_size))
-    std = np.sqrt(squared_img - mean ** 2)
+    std = np.sqrt(abs(squared_img - mean ** 2))
 
     # Calculate how far each pixel is from the local mean and standard deviation
     difference_from_mean = np.maximum(thermal_image.astype(np.float32) - mean, 0)
     normalized_difference = difference_from_mean / (std + 1e-7)  # Avoid divide-by-zero
-
 
     difference_from_mean_127norm =  cv2.normalize(difference_from_mean, None, 0, 127, cv2.NORM_MINMAX).astype(np.uint8)
     normalized_difference_127norm =  cv2.normalize(normalized_difference, None, 0, 127, cv2.NORM_MINMAX).astype(np.uint8)
@@ -280,11 +278,13 @@ class ThermalCameraApp(QWidget):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_frame)
         self.timer.start(100)
-
+        self.image_num = 0
+        self.curr_time = datetime.datetime.now().strftime("%Y%m%d_%H%M")
+        self.image_origin = []
         self.frozen_image = None
         try:
             # Attempt to open serial connection
-            self.camera = Boson(port="COM7")
+            self.camera = Boson(port="COM4")
             self.camera_connected = True
         except:
             print("Warning: No camera detected. Using synthetic image.")
@@ -306,6 +306,7 @@ class ThermalCameraApp(QWidget):
                 img_array = self.camera.grab()
                 if img_array is None:
                     raise ValueError("No image data received")
+                self.image_origin = img_array
                 img_array = np.fliplr(img_array)
                 img_array = np.flipud(img_array)
                 img_array = img_array / 100 - 273
@@ -316,6 +317,7 @@ class ThermalCameraApp(QWidget):
             # Generate synthetic dynamic image with shifting waves
             img_normalized = self.generate_synthetic_frame(self.frame_counter)
             self.frame_counter += 1  # Increment the frame counter for continuous motion
+            self.image_origin = img_normalized
 
         return img_normalized
 
@@ -329,9 +331,12 @@ class ThermalCameraApp(QWidget):
     def freeze_image(self):
         self.frozen_image = self.capture_frame()
         if self.frozen_image is not None:
-            processed_image, detections = detect_cameras(self.frozen_image)
+            print(f'{self.curr_time}_{str(self.image_num)}')
+            cv2.imwrite(fr"C:\Users\Phenomics\PycharmProjects\SecCam\imgs\boson_{self.curr_time}_{str(self.image_num)}.tiff", self.image_origin)
+            processed_image, detections = detect_cameras(self.image_origin)
             self.display_image(processed_image)
             print("Detections:", detections)
+            self.image_num+=1
 
     def resume_live_feed(self):
         """ Resume real-time image display """
