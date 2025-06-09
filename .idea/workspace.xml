@@ -5,7 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="80b8c00e-803e-4d9d-a83e-c5f61e7e4386" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/Thermi.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Thermi.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tools/detection_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/Tools/detection_tools.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cameras.py" beforeDir="false" afterPath="$PROJECT_DIR$/cameras.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cameras2.py" beforeDir="false" afterPath="$PROJECT_DIR$/cameras2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/real_time.py" beforeDir="false" afterPath="$PROJECT_DIR$/real_time.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,34 +36,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.cameras.executor&quot;: &quot;Run&quot;,
-    &quot;Python.cameras2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.cameras_with_sam.executor&quot;: &quot;Run&quot;,
-    &quot;Python.detection_tools.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ml.executor&quot;: &quot;Run&quot;,
-    &quot;Python.open_tagged (1).executor&quot;: &quot;Run&quot;,
-    &quot;Python.open_tagged.executor&quot;: &quot;Run&quot;,
-    &quot;Python.real_time.executor&quot;: &quot;Run&quot;,
-    &quot;Python.roc.executor&quot;: &quot;Run&quot;,
-    &quot;Python.sam_model.executor&quot;: &quot;Run&quot;,
-    &quot;Python.tagg_images (1).executor&quot;: &quot;Run&quot;,
-    &quot;Python.tagg_images.executor&quot;: &quot;Run&quot;,
-    &quot;Python.try.executor&quot;: &quot;Run&quot;,
-    &quot;Python.try2.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/PycharmProjects/PythonProject/Thermi&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.cameras.executor": "Run",
+    "Python.cameras2.executor": "Run",
+    "Python.cameras_with_sam.executor": "Run",
+    "Python.detection_tools.executor": "Run",
+    "Python.ml.executor": "Run",
+    "Python.open_tagged (1).executor": "Run",
+    "Python.open_tagged.executor": "Run",
+    "Python.real_time.executor": "Run",
+    "Python.roc.executor": "Run",
+    "Python.sam_model.executor": "Run",
+    "Python.tagg_images (1).executor": "Run",
+    "Python.tagg_images.executor": "Run",
+    "Python.try.executor": "Run",
+    "Python.try2.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "Merging master",
+    "last_opened_file_path": "C:/Users/User/PycharmProjects/PythonProject/Thermi",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\User\PycharmProjects\PythonProject\Thermi\Tools" />
@@ -214,7 +220,7 @@
       <workItem from="1747315371426" duration="93533000" />
       <workItem from="1747913335928" duration="11778000" />
       <workItem from="1748168310666" duration="5467000" />
-      <workItem from="1748329876176" duration="33913000" />
+      <workItem from="1748329876176" duration="39883000" />
     </task>
     <servers />
   </component>
@@ -222,8 +228,18 @@
     <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="070eee7d-f0cf-4ffe-bd76-0fbf88d538bc" value="TOOL_WINDOW" />
+      </map>
+    </option>
     <option name="TAB_STATES">
       <map>
+        <entry key="070eee7d-f0cf-4ffe-bd76-0fbf88d538bc">
+          <value>
+            <State />
+          </value>
+        </entry>
         <entry key="MAIN">
           <value>
             <State>
@@ -276,7 +292,7 @@
     <SUITE FILE_PATH="coverage/Thermi$try.coverage" NAME="try Coverage Results" MODIFIED="1746454845379" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Thermi$open_tagged.coverage" NAME="open_tagged Coverage Results" MODIFIED="1747139485243" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Thermi$cameras.coverage" NAME="cameras Coverage Results" MODIFIED="1747034431938" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Thermi$real_time.coverage" NAME="real_time Coverage Results" MODIFIED="1747639724032" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Thermi$real_time.coverage" NAME="real_time Coverage Results" MODIFIED="1748519641397" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Thermi$detection_tools.coverage" NAME="detection_tools Coverage Results" MODIFIED="1748506355218" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Tools" />
     <SUITE FILE_PATH="coverage/Thermi$try2.coverage" NAME="try2 Coverage Results" MODIFIED="1746365105279" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Thermi$cameras2.coverage" NAME="cameras2 Coverage Results" MODIFIED="1748507925916" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

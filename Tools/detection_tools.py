@@ -125,7 +125,7 @@ def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
 
     difference_from_mean_127norm =  cv2.normalize(difference_from_mean, None, 0, 127, cv2.NORM_MINMAX).astype(np.uint8)
     normalized_difference_127norm =  cv2.normalize(normalized_difference, None, 0, 127, cv2.NORM_MINMAX).astype(np.uint8)
-    binary_image = np.where(normalized_difference_127norm + difference_from_mean_127norm > np.percentile(normalized_difference_127norm + difference_from_mean_127norm, 98), 255, 0).astype(np.uint8)
+    binary_image = np.where(normalized_difference_127norm + difference_from_mean_127norm > np.percentile(normalized_difference_127norm + difference_from_mean_127norm, 97), 255, 0).astype(np.uint8)
     cv2.imshow("sum images", np.hstack((normalized_difference_127norm + difference_from_mean_127norm, binary_image)))
     sum_both = normalized_difference_127norm + difference_from_mean_127norm
 
@@ -184,7 +184,7 @@ def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
     bbox_and_max = []
     for c in contours:
         x, y, w, h = cv2.boundingRect(c)
-        if (cv2.contourArea(c) > 2 and cv2.contourArea(c) < 350):  # or w*h>5:
+        if (cv2.contourArea(c) > 2 and cv2.contourArea(c) < 700):  # or w*h>5:
             ratio = h / w if h > w else w / h
             # cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 0, 255), 2)
             # predicted_boxes.append([x, y, w, h])
@@ -215,7 +215,7 @@ def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
                     # cv2.putText(highlights, f"{diff_in_out:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3,(255, 0, 0), 1)
                     if  (difference_from_mean[y:y + h, x:x + w] > 1).sum() > 2 or (normalized_difference[y:y + h,x:x + w] > 1).sum() > 2: # or (difference_from_mean[y:y + h, x:x + w] > 2).sum() > 0 or (normalized_difference[y:y + h,x:x + w] > 2).sum() > 0:
                         # todo: has to be according to image illumination  ## diff_in_out > 0
-                        # cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                            # cv2.rectangle(highlights, (x, y), (x + w, y + h), (0, 255, 0), 2)
                         # cv2.putText(highlights, f"{diff_in_out:.1f}", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3,(255, 0, 0), 1)
                         # predicted_boxes.append([x, y, w, h])
 
@@ -293,7 +293,7 @@ def detect_cameras(thermal_image, diff_param =2, diff_in_out_param = 1):
     return highlights , predicted_boxes
 
 
-def run_check_detections(data_path, diff_in_out_param = 1, diff_param =2, disply_image_time = 1):
+def run_check_detections(data_path, diff_in_out_param = 1, diff_param =2, display_image_time = 1):
     dir_path = r"C:\Users\User\Desktop\SecCamera_Thermal\\"
     flip = ['v', 'h']  # flip image vertically and horizontally
     problem_names = []
@@ -319,29 +319,35 @@ def run_check_detections(data_path, diff_in_out_param = 1, diff_param =2, disply
             ground_truth_boxes = load_ground_truth(fr"C:\Users\User\Desktop\SecCamera_Thermal\jsons\\{fname[:-5]}.json")
             # Compare predictions against ground truth
             tp = 0
+            not_count = 0
             for gt in ground_truth_boxes:
                 best_iou = 0
                 for pred in predicted_boxes:
                     iou = compute_iou(pred, [gt["x"], gt["y"], gt["w"], gt["h"]])
+                    if iou > 0.5 and gt["label"] == "ignore":
+                        not_count += 1
                     best_iou = max(best_iou, iou)
                 if best_iou > 0.5 and gt["label"] == "detection":
                     tp+=1
 
+
             # ground_truth_boxes[ground_truth_boxes[:]['label'] == "detection"]
 
-
+            not_count = min(not_count,len(predicted_boxes) - tp)
             len_detections = len([obj for obj in ground_truth_boxes if obj["label"] == "detection"])
 
             if tp<len_detections:
                 problem_names.append(fname)
-            fp = len(predicted_boxes) - tp
+            fp = len(predicted_boxes) - tp - not_count
             fn = len_detections - tp
+            print(f"{fname} - TP: {tp}, FP: {fp}, FN: {fn}, Total Detections: {len(predicted_boxes)}, Ground Truth Detections: {len_detections}")
             all_fp.append(fp)
             all_tp.append(tp)
             all_fn.append(fn)
 
             cv2.imshow("image",highlights)
-            cv2.waitKey(disply_image_time)
+            cv2.waitKey(display_image_time)
+
 
 
     precision = sum(all_tp) / (sum(all_tp) + sum(all_fp)) if (sum(all_tp) + sum(all_fp)) > 0 else 0
